@@ -12,6 +12,7 @@ class FreightDashboardApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Freight Dashboard',
       theme: ThemeData(
         primarySwatch: Colors.blue,
