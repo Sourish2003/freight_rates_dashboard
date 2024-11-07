@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:freight_rates_dashboard/sidebar.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/autocomplete_provider.dart';
 
-class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+class QuotationsPage extends StatefulWidget {
+  const QuotationsPage({super.key});
 
   @override
-  State<DashboardScreen> createState() => _DashboardScreenState();
+  State<QuotationsPage> createState() => _QuotationsPageState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
+class _QuotationsPageState extends State<QuotationsPage> {
   bool includeNearbyOriginPorts = false;
   bool includeNearbyDestinationPorts = false;
   bool fcl = true;
@@ -31,115 +32,90 @@ class _DashboardScreenState extends State<DashboardScreen> {
     '45\' Dry High': {'length': 44.80, 'width': 7.83, 'height': 8.58},
   };
 
+  // For managing the history of previous searches
+  List<Map<String, dynamic>> searchHistory = [];
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          // Background Image
-          Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage("lib/assets/images/img.png"),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-
-          // Overlaying main content
-          Row(
+    return Column(
+      children: [
+        // Top bar
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+          color: Colors.white.withOpacity(0.8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Sidebar
-              const SidebarNavigation(),
+              const Text(
+                'Search the best Freight Rates',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              TextButton.icon(
+                onPressed: () {
+                  _showSearchHistory();
+                },
+                icon: const Icon(Icons.history),
+                label: const Text('History'),
+              ),
+            ],
+          ),
+        ),
 
-              // Content area
-              Expanded(
-                child: Column(
-                  children: [
-                    // Top bar
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-                      color: Colors.white.withOpacity(0.8),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'Search the best Freight Rates',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          TextButton.icon(
-                            onPressed: () {
-                              // Implement history functionality
-                            },
-                            icon: const Icon(Icons.history),
-                            label: const Text('History'),
-                          ),
-                        ],
-                      ),
+        // Main content area with 25% gap at the bottom
+        Expanded(
+          child: Stack(
+            children: [
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: MediaQuery.of(context).size.height * 0.25,
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.9),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 10,
+                          offset: Offset(0, 5),
+                        ),
+                      ],
                     ),
-
-                    // Main content area with 25% gap at the bottom
-                    Expanded(
-                      child: Stack(
-                        children: [
-                          Positioned(
-                            top: 0, // Aligns content container with top of the column (below top bar)
-                            left: 0,
-                            right: 0,
-                            bottom: MediaQuery.of(context).size.height * 0.25, // Leaves 25% gap at the bottom
-                            child: Padding(
-                              padding: const EdgeInsets.all(24.0),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.9),
-                                  borderRadius: BorderRadius.circular(20),
-                                  boxShadow: const [
-                                    BoxShadow(
-                                      color: Colors.black26,
-                                      blurRadius: 10,
-                                      offset: Offset(0, 5),
-                                    ),
-                                  ],
-                                ),
-                                padding: const EdgeInsets.all(24.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    _buildSearchFields(),
-                                    const SizedBox(height: 20),
-                                    _buildCommodityAndCutoffRow(),
-                                    const SizedBox(height: 20),
-                                    _buildShipmentTypeAndContainerSize(),
-                                    const SizedBox(height: 20),
-                                    _buildContainerDimensions(),
-                                    const Spacer(),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        _buildSearchButton(),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildSearchFields(),
+                        const SizedBox(height: 20),
+                        _buildCommodityAndCutoffRow(),
+                        const SizedBox(height: 20),
+                        _buildShipmentTypeAndContainerSize(),
+                        const SizedBox(height: 20),
+                        _buildContainerDimensions(),
+                        const Spacer(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            _buildSearchButton(),
+                          ],
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
-
 
   Widget _buildSearchFields() {
     return Row(
@@ -341,9 +317,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   void _updateContainerDimensions() {
     final dimensions = containerDimensions[selectedContainerSize]!;
-    lengthController.text = dimensions['length']!.toStringAsFixed(2);
-    widthController.text = dimensions['width']!.toStringAsFixed(2);
-    heightController.text = dimensions['height']!.toStringAsFixed(2);
+
+    setState(() {
+      lengthController.text = dimensions['length']!.toStringAsFixed(2);
+      widthController.text = dimensions['width']!.toStringAsFixed(2);
+      heightController.text = dimensions['height']!.toStringAsFixed(2);
+    });
   }
 
   Widget _buildContainerDimensions() {
@@ -381,12 +360,68 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildSearchButton() {
     return SizedBox(
-      child: ElevatedButton(
+      child: ElevatedButton.icon(
         onPressed: () {
-          // Implement search functionality
+          _performSearch();
         },
-        child: const Text('Search'),
+        icon: const Icon(Icons.search),
+        label: const Text('Search'),
       ),
+    );
+  }
+
+  void _performSearch() {
+    // Add your search functionality here
+    final searchParams = {
+      'origin': includeNearbyOriginPorts,
+      'destination': includeNearbyDestinationPorts,
+      'shipmentType': fcl ? 'FCL' : 'LCL',
+      'containerSize': selectedContainerSize,
+      'commodity': selectedCommodity,
+      'cutOffDate': DateFormat('dd/MM/yyyy').format(cutOffDate),
+    };
+
+    // Add the search params to the history
+    setState(() {
+      searchHistory.add(searchParams);
+    });
+
+    // Implement the logic to perform the search
+    // For example, call an API or display the results
+    print('Performing search with: $searchParams');
+  }
+
+  // Function to show previous search history
+  void _showSearchHistory() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Search History'),
+          content: SizedBox(
+            height: 300,
+            width: 300,
+            child: ListView.builder(
+              itemCount: searchHistory.length,
+              itemBuilder: (context, index) {
+                final historyItem = searchHistory[index];
+                return ListTile(
+                  title: Text('Origin: ${historyItem['origin']}'),
+                  subtitle: Text('Destination: ${historyItem['destination']}'),
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'dashboard.dart';
-
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'router/router.dart';
 
 void main() {
-  runApp(const FreightDashboardApp());
+  runApp(const ProviderScope(child: FreightDashboardApp()));
 }
 
 class FreightDashboardApp extends StatelessWidget {
@@ -11,20 +11,14 @@ class FreightDashboardApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'Freight Dashboard',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         scaffoldBackgroundColor: Colors.grey[100],
       ),
-      home: const DashboardScreen(),
+      routerConfig: router,
     );
   }
 }
-
-
-
-
-
-
