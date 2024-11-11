@@ -1,4 +1,3 @@
-// lib/widgets/shell.dart
 import 'package:flutter/material.dart';
 import 'sidebar.dart';
 

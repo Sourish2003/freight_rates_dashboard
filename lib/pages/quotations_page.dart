@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/autocomplete_provider.dart';
+import '../widgets/autocomplete_field.dart';
 
 class QuotationsPage extends StatefulWidget {
   const QuotationsPage({super.key});
@@ -143,26 +142,10 @@ class _QuotationsPageState extends State<QuotationsPage> {
 
   Widget _buildLocationField(
       String label, bool includeNearby, ValueChanged<bool?> onChanged) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TextField(
-          decoration: InputDecoration(
-            labelText: label,
-            border: const OutlineInputBorder(),
-            prefixIcon: const Icon(Icons.location_on_outlined),
-          ),
-        ),
-        Row(
-          children: [
-            Checkbox(
-              value: includeNearby,
-              onChanged: onChanged,
-            ),
-            Text('Include nearby $label ports'),
-          ],
-        ),
-      ],
+    return AutocompleteField(
+      label: label,
+      includeNearby: includeNearby,
+      onNearbyChanged: onChanged,
     );
   }
 
