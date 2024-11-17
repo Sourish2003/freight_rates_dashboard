@@ -162,7 +162,7 @@ class _QuotationsPageState extends State<QuotationsPage> {
               value: selectedCommodity,
               hint: const Text('Commodity'),
               isExpanded: true,
-              underline: const SizedBox(), // Removes the default underline
+              underline: const SizedBox(),
               items: const [
                 DropdownMenuItem(
                   value: 'wastepaper',
@@ -215,49 +215,77 @@ class _QuotationsPageState extends State<QuotationsPage> {
   }
 
   Widget _buildShipmentTypeAndContainerSize() {
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Shipment Type:'),
-              Row(
-                children: [
-                  Checkbox(
-                    value: fcl,
-                    onChanged: (bool? value) =>
-                        setState(() => fcl = value ?? false),
-                  ),
-                  const Text('FCL'),
-                  const SizedBox(width: 20),
-                  Checkbox(
-                    value: lcl,
-                    onChanged: (bool? value) =>
-                        setState(() => lcl = value ?? false),
-                  ),
-                  const Text('LCL'),
-                ],
-              ),
-            ],
-          ),
+        const Text('Shipment Type:'),
+        Row(
+          children: [
+            Checkbox(
+              value: fcl,
+              onChanged: (bool? value) => setState(() => fcl = value ?? false),
+            ),
+            const Text('FCL'),
+            const SizedBox(width: 20),
+            Checkbox(
+              value: lcl,
+              onChanged: (bool? value) => setState(() => lcl = value ?? false),
+            ),
+            const Text('LCL'),
+          ],
         ),
-        const SizedBox(width: 20),
-        Expanded(
-          child: _buildDropdownField(
-            'Container Size',
-            selectedContainerSize,
-                (String value) {
-              setState(() {
-                selectedContainerSize = value;
-                _updateContainerDimensions();
-              });
-            },
-          ),
+        const SizedBox(height: 20),
+
+        // New Row with Container Size, No of Boxes, and Weight fields
+        Row(
+          children: [
+            // Container Size Dropdown
+            Expanded(
+              flex: 2,
+              child: _buildDropdownField(
+                'Container Size',
+                selectedContainerSize,
+                    (String value) {
+                  setState(() {
+                    selectedContainerSize = value;
+                    _updateContainerDimensions();
+                  });
+                },
+              ),
+            ),
+            const SizedBox(width: 20),
+
+            // No of Boxes TextField
+            const Flexible(
+              flex: 1,
+              child: TextField(
+                decoration: InputDecoration(
+                  labelText: 'No of Boxes',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+              ),
+            ),
+            const SizedBox(width: 20),
+
+            // Weight TextField
+            const Flexible(
+              flex: 1,
+              child: TextField(
+                decoration: InputDecoration(
+                  labelText: 'Weight (Kg)',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+              ),
+            ),
+          ],
         ),
       ],
     );
   }
+
+
 
   Widget _buildDropdownField(
       String label, String value, ValueChanged<String> onChanged) {

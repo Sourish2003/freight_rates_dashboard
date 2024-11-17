@@ -76,9 +76,7 @@ class AutocompleteField extends ConsumerWidget {
             );
           },
           optionsViewBuilder: (context, onSelected, options) {
-            // Get the width of the window
             double windowWidth = MediaQuery.of(context).size.width;
-            // Set a max width relative to the window size, similar to how the text fields are adjusted
             double dropdownMaxWidth = windowWidth * 0.45; // Adjust this factor as needed
 
             return Align(
