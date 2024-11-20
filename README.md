@@ -2,6 +2,9 @@
 
 Dashboard that has freight rates Quotations
 
+## Demo video explaining the UI
+https://1drv.ms/v/s!AlxDnPnJwsxhiKovygWQIYg9p5jrsg?e=1nOsVo
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
