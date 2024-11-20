@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../widgets/autocomplete_field.dart';
@@ -153,32 +155,30 @@ class _QuotationsPageState extends State<QuotationsPage> {
     return Row(
       children: [
         Expanded(
-          child: InputDecorator(
+          child: DropdownButtonFormField<String>(
+            value: selectedCommodity,
+            hint: const Text('Commodity'),
             decoration: const InputDecoration(
-              border: OutlineInputBorder(),
               labelText: 'Commodity',
+              border: OutlineInputBorder(),
             ),
-            child: DropdownButton<String>(
-              value: selectedCommodity,
-              hint: const Text('Commodity'),
-              isExpanded: true,
-              underline: const SizedBox(),
-              items: const [
-                DropdownMenuItem(
-                  value: 'wastepaper',
-                  child: Text('wastepaper'),
-                ),
-                DropdownMenuItem(
-                  value: 'metal',
-                  child: Text('metal'),
-                ),
-              ],
-              onChanged: (String? value) {
-                setState(() {
-                  selectedCommodity = value;
-                });
-              },
-            ),
+            // isExpanded: true,
+            // underline: const SizedBox(),
+            items: const [
+              DropdownMenuItem(
+                value: 'wastepaper',
+                child: Text('wastepaper'),
+              ),
+              DropdownMenuItem(
+                value: 'metal',
+                child: Text('metal'),
+              ),
+            ],
+            onChanged: (String? value) {
+              setState(() {
+                selectedCommodity = value;
+              });
+            },
           ),
         ),
         const SizedBox(width: 20),
@@ -315,7 +315,14 @@ class _QuotationsPageState extends State<QuotationsPage> {
               return ListTile(
                 title: Text(size),
                 onTap: () {
-                  onChanged(size);
+                  debugPrint('Selected container size: $size');
+                  setState(() {
+                    selectedContainerSize = size;
+                    final dimensions = containerDimensions[size]!;
+                    lengthController.text = dimensions['length']!.toStringAsFixed(2);
+                    widthController.text = dimensions['width']!.toStringAsFixed(2);
+                    heightController.text = dimensions['height']!.toStringAsFixed(2);
+                  });
                   Navigator.of(context).pop();
                 },
               );
@@ -327,12 +334,22 @@ class _QuotationsPageState extends State<QuotationsPage> {
   }
 
   void _updateContainerDimensions() {
+    // Get the base dimensions for the selected container size
     final dimensions = containerDimensions[selectedContainerSize]!;
 
+    // Add small random variations to make it more realistic
+    final random = Random();
+    final lengthVariation = (random.nextDouble() * 0.4) - 0.2; // ±0.2 ft variation
+    final widthVariation = (random.nextDouble() * 0.2) - 0.1;  // ±0.1 ft variation
+    final heightVariation = (random.nextDouble() * 0.2) - 0.1;  // ±0.1 ft variation
+
     setState(() {
-      lengthController.text = dimensions['length']!.toStringAsFixed(2);
-      widthController.text = dimensions['width']!.toStringAsFixed(2);
-      heightController.text = dimensions['height']!.toStringAsFixed(2);
+      lengthController.text =
+          (dimensions['length']! + lengthVariation).toStringAsFixed(2);
+      widthController.text =
+          (dimensions['width']! + widthVariation).toStringAsFixed(2);
+      heightController.text =
+          (dimensions['height']! + heightVariation).toStringAsFixed(2);
     });
   }
 
@@ -340,34 +357,80 @@ class _QuotationsPageState extends State<QuotationsPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Container Internal Dimensions:'),
-        const SizedBox(height: 10),
+        const Text(
+          'Container Internal Dimensions :',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 24),
         Row(
           children: [
-            _buildDimensionField('Length', lengthController, 'ft'),
-            const SizedBox(width: 20),
-            _buildDimensionField('Width', widthController, 'ft'),
-            const SizedBox(width: 20),
-            _buildDimensionField('Height', heightController, 'ft'),
+            // Left side with dimensions
+            Expanded(
+              flex: 2,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildDimensionRow('Length', lengthController.text),
+                  const SizedBox(height: 16),
+                  _buildDimensionRow('Width', widthController.text),
+                  const SizedBox(height: 16),
+                  _buildDimensionRow('Height', heightController.text),
+                ],
+              ),
+            ),
+            // Right side with container image
+            Expanded(
+              flex: 2,
+              child: Container(
+                height: 150,
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/images/container_image.png'),
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+            ),
+            const Spacer(),
+            const Spacer(),
+
+
           ],
         ),
       ],
     );
   }
 
-  Widget _buildDimensionField(
-      String label, TextEditingController controller, String unit) {
-    return Expanded(
-      child: TextField(
-        controller: controller,
-        readOnly: true,
-        decoration: InputDecoration(
-          labelText: '$label ($unit)',
-          border: const OutlineInputBorder(),
+
+
+  Widget _buildDimensionRow(String label, String value) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 100,
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontSize: 20,
+              color: Colors.black54,
+            ),
+          ),
         ),
-      ),
+        const SizedBox(width: 16),
+        Text(
+          '$value ft',
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
     );
   }
+
 
   Widget _buildSearchButton() {
     return SizedBox(
@@ -399,7 +462,7 @@ class _QuotationsPageState extends State<QuotationsPage> {
 
     // Implement the logic to perform the search
     // For example, call an API or display the results
-    print('Performing search with: $searchParams');
+    debugPrint('Performing search with: $searchParams');
   }
 
   // Function to show previous search history

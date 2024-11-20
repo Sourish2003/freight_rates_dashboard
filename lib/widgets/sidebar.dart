@@ -91,7 +91,7 @@ class SidebarNavigation extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Image.asset(
-        'lib/assets/images/demo_logo.png',
+        'assets/images/demo_logo.png',
       ),
     );
   }
@@ -117,7 +117,7 @@ class SidebarNavigation extends StatelessWidget {
             CircleAvatar(
               radius: 16,
               backgroundImage:
-              const AssetImage('lib/assets/images/profile_placeholder.png'),
+              const AssetImage('assets/images/profile_placeholder.png'),
               backgroundColor: isSelected ? Colors.blue.withOpacity(0.1) : null,
             ),
             const SizedBox(height: 4),

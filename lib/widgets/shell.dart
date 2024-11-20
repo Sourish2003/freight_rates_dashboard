@@ -14,7 +14,7 @@ class Shell extends StatelessWidget {
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: AssetImage("lib/assets/images/img.png"),
+                image: AssetImage("assets/images/img.png"),
                 fit: BoxFit.cover,
               ),
             ),

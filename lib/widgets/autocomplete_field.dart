@@ -61,10 +61,9 @@ class AutocompleteField extends ConsumerWidget {
             return _searchUniversities(ref, textEditingValue.text);
           },
           onSelected: (University selection) {
-            print('Selected: ${selection.name}, ${selection.country}');
+            debugPrint('Selected: ${selection.name}, ${selection.country}');
           },
           fieldViewBuilder: (context, textEditingController, focusNode, onFieldSubmitted) {
-            double textFieldWidth = MediaQuery.of(context).size.width;
             return TextField(
               controller: textEditingController,
               focusNode: focusNode,
